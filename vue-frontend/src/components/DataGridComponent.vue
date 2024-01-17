@@ -1,152 +1,253 @@
 <template>
-    <!-- Root element of the Vue app -->
-    <div id="app">
-      <!-- Header section -->
-      <header>
-        <!-- Main title -->
-        <h1>Data Grid and Tree</h1>
-      </header>
-      <br/> <!-- Line break for separation -->
-  
-      <!-- Data Grid section -->
-      <section class="grid-section">
-        <!-- Subtitle for the Data Grid section -->
-        <h2>Data Grid</h2>
-        <!-- DevExtreme DataGrid component -->
-        <dx-data-grid :data-source="filteredGridData" key-expr="id" :column-auto-width="true">
-          <!-- DataGrid columns -->
-          <dxo-column data-field="Id" caption="Id"></dxo-column>
-          <dxo-column data-field="Name" caption="Name"></dxo-column>
-          <dxo-column data-field="Alamat" caption="Alamat"></dxo-column>
-          
-          <!-- Custom command column for Add, Edit, and Delete buttons -->
-          <dxo-column type="buttons">
-            <!-- Template for custom buttons in the column -->
-            <template #cellTemplate="data">
-              <!-- Edit button -->
-    <button
-      title="Ubah Data"
-      class="me-1 btn-light-warning border border-warning btn btn-xs btn-icon"
-      @click="editData(data.data.Id)"
-    >
-      Edit Data
-    </button>
-    <!-- Other buttons (Add, Delete) as needed -->
-    <dx-button
-      :show-delete="true"
-      @on-delete="handleDeleteRow"
-    ></dx-button>
-            </template>
-          </dxo-column>
-        </dx-data-grid>
-      </section>
+  <div id="app">
+    <header>
+      <h1>Data Grid and Tree</h1>
+    </header>
+    <br />
+
+    <section class="grid-section">
+      <h2>Data Grid</h2>
+      <div class="mb-3 d-flex justify-content-between align-items-center">
+        <button class="btn btn-success" @click="showAddModal">Add Data</button>
+        <button class="btn btn-danger btn-xs" @click="showDeleteModal">Delete Data</button> 
+      </div>
+
+      <dx-data-grid :data-source="filteredGridData" key-expr="id" :column-auto-width="true">
+        <dxo-column data-field="id" caption="Id"></dxo-column>
+        <dxo-column data-field="name" caption="Name"></dxo-column>
+        <dxo-column data-field="alamat" caption="Alamat"></dxo-column>
+        <dxo-column data-field="email" caption="Email"></dxo-column>
+        <dxo-column type="buttons">
+         
+        </dxo-column>
+      </dx-data-grid>
+    </section>
+
+<!-- Add Data Modal -->
+<div class="modal" :class="{ 'is-active': isAddModalVisible }">
+  <div class="modal-background" @click="hideAddModal"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add Data</p>
+      <button class="delete" aria-label="close" @click="hideAddModal"></button>
+    </header>
+    <section class="modal-card-body">
+      <form @submit.prevent="addData"> <!-- Add this line -->
+        <table class="table table-borderless">
+          <tbody>
+            <tr>
+              <td class="label">Name</td>
+              <td>
+                <div class="control">
+                  <input class="input" v-model="newData.name" required />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Alamat</td>
+              <td>
+                <div class="control">
+                  <input class="input" v-model="newData.alamat" required />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="label">Email</td>
+              <td>
+                <div class="control">
+                  <input class="input" v-model="newData.email" required />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div class="control">
+                  <button type="submit" class="button is-primary">Submit</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form> <!-- Add this line -->
+    </section>
+  </div>
+</div>
+
+
+    <!-- Delete Data Modal -->
+    <div class="modal" :class="{ 'is-active': isDeleteModalVisible }">
+      <div class="modal-background" @click="hideDeleteModal"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Delete Data</p>
+          <button class="delete" aria-label="close" @click="hideDeleteModal"></button>
+        </header>
+        <section class="modal-card-body">
+          <form @submit.prevent="deleteData">
+            <div class="field">
+              <label class="label">ID</label>
+              <div class="control">
+                <input class="input" v-model="deleteDataId" required />
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <button type="submit" class="button is-danger">Delete</button>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
-  </template>
-  
-  <script>
-  // Importing necessary dependencies and styles
-  
-  // Importing DevExtreme components from the correct module
-  import 'devextreme/dist/css/dx.light.css';
-  import { DxDataGrid, DxoColumn, DxButtons, DxButton } from 'devextreme-vue/ui/data-grid';
-  import axios from 'axios';
-  
-  // Importing custom CSS file
-  import '@/assets/datagrid.css';
-  
-  export default {
-    // Component name
-    name: 'App',
-    // Data properties
-    data() {
-      return {
-        rawData: [],           // Raw data from the API
-        filteredGridData: [],  // Processed data for the DataGrid
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import { DxDataGrid, DxoColumn } from "devextreme-vue/ui/data-grid";
+
+export default {
+  name: "App",
+  data() {
+    return {
+      rawData: [],
+      filteredGridData: [],
+      isAddModalVisible: false,
+      isDeleteModalVisible: false,
+      newData: {
+        name: "",
+        alamat: "",
+        email: "",
+      },
+      deleteDataId: "", // ID for the delete operation
+    };
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    fetchData() {
+      axios
+        .get("http://localhost:8080/siswa")
+        .then((response) => {
+          this.rawData = response.data;
+          this.filteredGridData = this.rawData.map((item) => ({
+            id: item.id,
+            name: item.name,
+            alamat: item.alamat,
+            email: item.email,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    },
+    showAddModal() {
+      this.isAddModalVisible = true;
+    },
+    hideAddModal() {
+      this.isAddModalVisible = false;
+      this.newData = {
+        name: "",
+        alamat: "",
+        email: "",
       };
     },
-    // Lifecycle hook - executed when the component is mounted
-    mounted() {
-      // Fetching data from the API when the component is mounted
-      this.fetchData();
+    addData() {
+      axios
+        .post("http://localhost:8080/siswa", this.newData)
+        .then((response) => {
+          console.log("Data added successfully:", response.data);
+          this.fetchData();
+          this.hideAddModal();
+        })
+        .catch((error) => {
+          console.error("Error adding data:", error);
+        });
     },
-    // Methods section
-    methods: {
-      // Method to fetch data from the API
-      fetchData() {
-        axios.get('http://localhost:8080/siswa')
-          .then(response => {
-            // Assigning raw data to the 'rawData' property
-            this.rawData = response.data;
-            // Processing raw data and assigning it to the 'filteredGridData' property
-            this.filteredGridData = this.rawData.map(item => ({
-              id: item.id,
-              name: item.name,
-              alamat: item.alamat,
-            }));
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-          });
-      },
-      // Method to handle "Edit Data" button click
-      editData(id) {
-        // Redirect to the edit page or show a modal for editing
-        // For now, let's log the ID and make a request to the edit endpoint
-        console.log('Edit Data button clicked for ID:', id);
-        axios.get(`http://localhost:8080/siswa/${id}`)
-          .then(response => {
-            // Handle the response, for example, show an edit form with the data
-            console.log('Edit Data response:', response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching edit data:', error);
-          });
-      },
-      // Method to handle "Delete" button click
-      handleDeleteRow(e) {
-        // Implement logic for row deletion
-        // For example, you can make an API call to delete the selected row
-        console.log('Delete row:', e.data);
-      },
+    editData(id) {
+      console.log("Edit Data button clicked for ID:", id);
+      axios
+        .get(`http://localhost:8080/siswa/${id}`)
+        .then((response) => {
+          console.log("Edit Data response:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching edit data:", error);
+        });
     },
-    // Registering Vue components
-    components: {
-      DxDataGrid,
-      DxoColumn,
-      DxButtons,
-      DxButton,
+    showDeleteModal() {
+      this.isDeleteModalVisible = true;
     },
-  };
-  </script>
-  
-  <style>
-  /* Styling for the root element of the Vue app */
-  #app {
-    text-align: center;   /* Center align text */
-    color: #2c3e50;       /* Text color */
-    margin-top: 20px;     /* Top margin */
-  }
-  
-  /* Styling for the header section */
-  header {
-    background-color: #3498db;  /* Background color */
-    color: white;               /* Text color */
-    padding: 10px;              /* Padding around the content */
-  }
-  
-  /* Styling for h1 and h2 elements */
-  h1, h2 {
-    margin-bottom: 10px;  /* Bottom margin for h1 and h2 elements */
-  }
-  
-  /* Styling for the button section */
-  .button-section {
-    margin-bottom: 20px; /* Bottom margin for button section */
-  }
-  
-  /* Styling for buttons */
-  button {
-    margin-right: 10px;  /* Right margin between buttons */
-  }
-  </style>
-  
+    hideDeleteModal() {
+      this.isDeleteModalVisible = false;
+      this.deleteDataId = "";
+    },
+    deleteData() {
+      axios
+        .delete(`http://localhost:8080/siswa/${this.deleteDataId}`)
+        .then(() => {
+          console.log("Data deleted successfully");
+          this.fetchData();
+          this.hideDeleteModal();
+        })
+        .catch((error) => {
+          console.error("Error deleting data:", error);
+        });
+    },
+  },
+  components: {
+    DxDataGrid,
+    DxoColumn,
+  },
+};
+</script>
+
+<style>
+#app {
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 20px;
+}
+
+header {
+  background-color: #3498db;
+  color: white;
+  padding: 10px;
+}
+
+.grid-section {
+  margin: 20px;
+}
+
+.modal {
+  display: none;
+}
+
+.modal.is-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card {
+  width: 400px;
+}
+
+.dx-datagrid {
+  border: 1px solid #ccc;
+}
+
+.dx-datagrid-rowsview {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+.dx-datagrid-content {
+  border-bottom: 1px solid #ccc;
+}
+
+.dx-datagrid-rowsview .dx-row {
+  border-bottom: 1px solid #ccc;
+}
+</style>
