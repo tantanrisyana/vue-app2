@@ -1,78 +1,85 @@
 <template>
   <div id="app">
     <header>
-      <h1>Data Grid and Tree</h1>
+      <h1>DATA SISWA</h1>
     </header>
     <br />
 
     <section class="grid-section">
-      <h2>Data Grid</h2>
       <div class="mb-3 d-flex justify-content-between align-items-center">
         <button class="btn btn-success" @click="showAddModal">Add Data</button>
-        <button class="btn btn-danger btn-xs" @click="showDeleteModal">Delete Data</button> 
+        <button class="btn btn-success" @click="showDeleteModal">Delete Data</button>
       </div>
 
       <dx-data-grid :data-source="filteredGridData" key-expr="id" :column-auto-width="true">
-        <dxo-column data-field="id" caption="Id"></dxo-column>
+        <!-- Column for sequential number (No) -->
+        <dxo-column data-field="no" caption="No"></dxo-column>
+        <!-- Hidden column for 'id' -->
+        <dxo-column v-if="false" data-field="id" caption="Id"></dxo-column>
+        <!-- Columns for visible data -->
         <dxo-column data-field="name" caption="Name"></dxo-column>
         <dxo-column data-field="alamat" caption="Alamat"></dxo-column>
         <dxo-column data-field="email" caption="Email"></dxo-column>
-        <dxo-column type="buttons">
-         
+        <!-- Column for custom action (Delete) -->
+        <dxo-column data-field="action" caption="Action">
+          <dxo-cell-template>
+            <div class="custom-action" @click="deleteRow(data.data.id)">
+              <i class="icon-delete"></i>
+            </div>
+          </dxo-cell-template>
         </dxo-column>
       </dx-data-grid>
     </section>
 
-<!-- Add Data Modal -->
-<div class="modal" :class="{ 'is-active': isAddModalVisible }">
-  <div class="modal-background" @click="hideAddModal"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">Add Data</p>
-      <button class="delete" aria-label="close" @click="hideAddModal"></button>
-    </header>
-    <section class="modal-card-body">
-      <form @submit.prevent="addData"> <!-- Add this line -->
-        <table class="table table-borderless">
-          <tbody>
-            <tr>
-              <td class="label">Name</td>
-              <td>
-                <div class="control">
-                  <input class="input" v-model="newData.name" required />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="label">Alamat</td>
-              <td>
-                <div class="control">
-                  <input class="input" v-model="newData.alamat" required />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="label">Email</td>
-              <td>
-                <div class="control">
-                  <input class="input" v-model="newData.email" required />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div class="control">
-                  <button type="submit" class="button is-primary">Submit</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form> <!-- Add this line -->
-    </section>
-  </div>
-</div>
-
+    <!-- Add Data Modal -->
+    <div class="modal" :class="{ 'is-active': isAddModalVisible }">
+      <div class="modal-background" @click="hideAddModal"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Tambah Data</p>
+          <button class="delete" aria-label="close" @click="hideAddModal"></button>
+        </header>
+        <section class="modal-card-body">
+          <form @submit.prevent="addData">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td class="label">Name</td>
+                  <td>
+                    <div class="control">
+                      <input class="input" v-model="newData.name" required />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Alamat</td>
+                  <td>
+                    <div class="control">
+                      <input class="input" v-model="newData.alamat" required />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label">Email</td>
+                  <td>
+                    <div class="control">
+                      <input class="input" v-model="newData.email" required />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div class="control">
+                      <button type="submit" class="button is-primary">Submit</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </section>
+      </div>
+    </div>
 
     <!-- Delete Data Modal -->
     <div class="modal" :class="{ 'is-active': isDeleteModalVisible }">
@@ -83,7 +90,7 @@
           <button class="delete" aria-label="close" @click="hideDeleteModal"></button>
         </header>
         <section class="modal-card-body">
-          <form @submit.prevent="deleteData">
+          <form @submit.prevent="confirmDelete">
             <div class="field">
               <label class="label">ID</label>
               <div class="control">
@@ -92,7 +99,7 @@
             </div>
             <div class="field">
               <div class="control">
-                <button type="submit" class="button is-danger">Delete</button>
+                <button type="button" class="button is-danger" @click="confirmDelete">Delete</button>
               </div>
             </div>
           </form>
@@ -131,8 +138,10 @@ export default {
         .get("http://localhost:8080/siswa")
         .then((response) => {
           this.rawData = response.data;
-          this.filteredGridData = this.rawData.map((item) => ({
+          this.filteredGridData = this.rawData.map((item, index) => ({
+            no: index + 1,
             id: item.id,
+            action: "Delete",
             name: item.name,
             alamat: item.alamat,
             email: item.email,
@@ -182,6 +191,12 @@ export default {
     hideDeleteModal() {
       this.isDeleteModalVisible = false;
       this.deleteDataId = "";
+    },
+    confirmDelete() {
+      // Add confirmation logic here
+      if (confirm("Are you sure you want to delete this data?")) {
+        this.deleteData();
+      }
     },
     deleteData() {
       axios
