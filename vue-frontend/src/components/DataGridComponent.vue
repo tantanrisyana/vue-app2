@@ -20,14 +20,6 @@
         <dxo-column data-field="name" caption="Name"></dxo-column>
         <dxo-column data-field="alamat" caption="Alamat"></dxo-column>
         <dxo-column data-field="email" caption="Email"></dxo-column>
-        <!-- Column for custom action (Delete) -->
-        <dxo-column data-field="action" caption="Action">
-          <dxo-cell-template>
-            <div class="custom-action" @click="deleteRow(data.data.id)">
-              <i class="icon-delete"></i>
-            </div>
-          </dxo-cell-template>
-        </dxo-column>
       </dx-data-grid>
     </section>
 
@@ -141,7 +133,6 @@ export default {
           this.filteredGridData = this.rawData.map((item, index) => ({
             no: index + 1,
             id: item.id,
-            action: "Delete",
             name: item.name,
             alamat: item.alamat,
             email: item.email,
