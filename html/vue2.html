@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Input String</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+<h2>Contoh Input model</h2>
+<div id="app">
+  <input v-model="inputString" placeholder="Masukkan nama">
+  <p v-if="inputString !== ''">Nama Lengkap: {{ inputString }}</p>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    inputString: ''
+  }
+});
+</script>
+
+</body>
+</html>
