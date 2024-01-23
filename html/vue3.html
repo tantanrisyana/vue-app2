@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue To-Do List</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <h1>Vue To-Do List</h1>
+  
+  <input v-model="newTask" placeholder="Tambah tugas...">
+  <input v-model="newTime" placeholder="Jam...">
+  <button @click="addTask">Tambah Tugas</button>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Tugas</th>
+        <th>Jam</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(task, index) in tasks" :key="index">
+        <td>{{ task.task }}</td>
+        <td>{{ task.time }}</td>
+        <td>
+          <button @click="editTask(index)">Edit</button>
+          <button @click="deleteTask(index)">Hapus</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    newTask: '',
+    newTime: '',
+    tasks: []
+  },
+  methods: {
+    addTask: function() {
+      if (this.newTask.trim() !== '' && this.newTime.trim() !== '') {
+        this.tasks.push({ task: this.newTask, time: this.newTime });
+        this.newTask = '';
+        this.newTime = '';
+      }
+    },
+    editTask: function(index) {
+      const updatedTask = prompt('Edit tugas:', this.tasks[index].task);
+      const updatedTime = prompt('Edit jam:', this.tasks[index].time);
+      if (updatedTask !== null && updatedTime !== null) {
+        this.$set(this.tasks, index, { task: updatedTask, time: updatedTime });
+      }
+    },
+    deleteTask: function(index) {
+      const confirmation = confirm('Apakah Anda yakin ingin menghapus tugas ini?');
+      if (confirmation) {
+        this.tasks.splice(index, 1);
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
