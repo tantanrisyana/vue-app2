@@ -1,0 +1,49 @@
+/* src/assets/styles.css */
+
+#app {
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 20px;
+  }
+  
+  header {
+    background-color: #3498db;
+    color: white;
+    padding: 10px;
+  }
+  
+  .grid-section {
+    margin: 20px;
+  }
+  
+  .modal {
+    display: none;
+  }
+  
+  .modal.is-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-card {
+    width: 400px;
+  }
+  
+  .dx-datagrid {
+    border: 1px solid #ccc;
+  }
+  
+  .dx-datagrid-rowsview {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .dx-datagrid-content {
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .dx-datagrid-rowsview .dx-row {
+    border-bottom: 1px solid #ccc;
+  }
+  

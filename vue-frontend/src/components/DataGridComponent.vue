@@ -12,18 +12,14 @@
       </div>
 
       <dx-data-grid :data-source="filteredGridData" key-expr="id" :column-auto-width="true">
-        <!-- Column for sequential number (No) -->
         <dxo-column data-field="no" caption="No"></dxo-column>
-        <!-- Hidden column for 'id' -->
         <dxo-column v-if="false" data-field="id" caption="Id"></dxo-column>
-        <!-- Columns for visible data -->
         <dxo-column data-field="name" caption="Name"></dxo-column>
         <dxo-column data-field="alamat" caption="Alamat"></dxo-column>
         <dxo-column data-field="email" caption="Email"></dxo-column>
       </dx-data-grid>
     </section>
 
-    <!-- Add Data Modal -->
     <div class="modal" :class="{ 'is-active': isAddModalVisible }">
       <div class="modal-background" @click="hideAddModal"></div>
       <div class="modal-card">
@@ -73,7 +69,6 @@
       </div>
     </div>
 
-    <!-- Delete Data Modal -->
     <div class="modal" :class="{ 'is-active': isDeleteModalVisible }">
       <div class="modal-background" @click="hideDeleteModal"></div>
       <div class="modal-card">
@@ -101,159 +96,130 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, ref } from "vue";
 import axios from "axios";
 import { DxDataGrid, DxoColumn } from "devextreme-vue/ui/data-grid";
+import "@/assets/styles.css"; // Import the styles
 
-export default {
+export default defineComponent({
   name: "App",
-  data() {
-    return {
-      rawData: [],
-      filteredGridData: [],
-      isAddModalVisible: false,
-      isDeleteModalVisible: false,
-      newData: {
-        name: "",
-        alamat: "",
-        email: "",
-      },
-      deleteDataId: "", // ID for the delete operation
+  setup() {
+    // Inline definition of the Siswa type
+    interface Siswa {
+      id: number;
+      name: string;
+      alamat: string;
+      email: string;
+    }
+
+    const rawData = ref<Siswa[]>([]);
+    const filteredGridData = ref<Array<{ no: number; id: number; name: string; alamat: string; email: string }>>([]);
+    const isAddModalVisible = ref(false);
+    const isDeleteModalVisible = ref(false);
+    const newData = ref<Siswa>({
+      name: "",
+      alamat: "",
+      email: "",
+      id: 0,
+    });
+    const deleteDataId = ref<number | string>("");
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Siswa[]>("http://localhost:8080/siswa");
+        rawData.value = response.data;
+        filteredGridData.value = rawData.value.map((item, index) => ({
+          no: index + 1,
+          id: item.id,
+          name: item.name,
+          alamat: item.alamat,
+          email: item.email,
+        }));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
-  },
-  mounted() {
-    this.fetchData();
-  },
-  methods: {
-    fetchData() {
-      axios
-        .get("http://localhost:8080/siswa")
-        .then((response) => {
-          this.rawData = response.data;
-          this.filteredGridData = this.rawData.map((item, index) => ({
-            no: index + 1,
-            id: item.id,
-            name: item.name,
-            alamat: item.alamat,
-            email: item.email,
-          }));
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    },
-    showAddModal() {
-      this.isAddModalVisible = true;
-    },
-    hideAddModal() {
-      this.isAddModalVisible = false;
-      this.newData = {
+
+    const showAddModal = () => {
+      isAddModalVisible.value = true;
+    };
+
+    const hideAddModal = () => {
+      isAddModalVisible.value = false;
+      newData.value = {
         name: "",
         alamat: "",
         email: "",
+        id: 0,
       };
-    },
-    addData() {
+    };
+
+    const addData = () => {
       axios
-        .post("http://localhost:8080/siswa", this.newData)
+        .post("http://localhost:8080/siswa", newData.value)
         .then((response) => {
           console.log("Data added successfully:", response.data);
-          this.fetchData();
-          this.hideAddModal();
+          fetchData();
+          hideAddModal();
         })
         .catch((error) => {
           console.error("Error adding data:", error);
         });
-    },
-    editData(id) {
-      console.log("Edit Data button clicked for ID:", id);
-      axios
-        .get(`http://localhost:8080/siswa/${id}`)
-        .then((response) => {
-          console.log("Edit Data response:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching edit data:", error);
-        });
-    },
-    showDeleteModal() {
-      this.isDeleteModalVisible = true;
-    },
-    hideDeleteModal() {
-      this.isDeleteModalVisible = false;
-      this.deleteDataId = "";
-    },
-    confirmDelete() {
-      // Add confirmation logic here
+    };
+
+    const showDeleteModal = () => {
+      isDeleteModalVisible.value = true;
+    };
+
+    const hideDeleteModal = () => {
+      isDeleteModalVisible.value = false;
+      deleteDataId.value = "";
+    };
+
+    const confirmDelete = () => {
       if (confirm("Are you sure you want to delete this data?")) {
-        this.deleteData();
+        deleteData();
       }
-    },
-    deleteData() {
+    };
+
+    const deleteData = () => {
       axios
-        .delete(`http://localhost:8080/siswa/${this.deleteDataId}`)
+        .delete(`http://localhost:8080/siswa/${deleteDataId.value}`)
         .then(() => {
           console.log("Data deleted successfully");
-          this.fetchData();
-          this.hideDeleteModal();
+          fetchData();
+          hideDeleteModal();
         })
         .catch((error) => {
           console.error("Error deleting data:", error);
         });
-    },
+    };
+
+    fetchData();
+
+    return {
+      rawData,
+      filteredGridData,
+      isAddModalVisible,
+      isDeleteModalVisible,
+      newData,
+      deleteDataId,
+      fetchData,
+      showAddModal,
+      hideAddModal,
+      addData,
+      showDeleteModal,
+      hideDeleteModal,
+      confirmDelete,
+      deleteData,
+    };
   },
   components: {
     DxDataGrid,
     DxoColumn,
   },
-};
+});
+
 </script>
 
-<style>
-#app {
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 20px;
-}
-
-header {
-  background-color: #3498db;
-  color: white;
-  padding: 10px;
-}
-
-.grid-section {
-  margin: 20px;
-}
-
-.modal {
-  display: none;
-}
-
-.modal.is-active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-card {
-  width: 400px;
-}
-
-.dx-datagrid {
-  border: 1px solid #ccc;
-}
-
-.dx-datagrid-rowsview {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-}
-
-.dx-datagrid-content {
-  border-bottom: 1px solid #ccc;
-}
-
-.dx-datagrid-rowsview .dx-row {
-  border-bottom: 1px solid #ccc;
-}
-</style>
