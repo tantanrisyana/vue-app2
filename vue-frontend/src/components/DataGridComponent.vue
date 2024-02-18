@@ -26,6 +26,7 @@
         <header class="modal-card-head">
           <p class="modal-card-title">Tambah Data</p>
           <button class="delete" aria-label="close" @click="hideAddModal"></button>
+          
         </header>
         <section class="modal-card-body">
           <form @submit.prevent="addData">
@@ -59,6 +60,7 @@
                   <td colspan="2">
                     <div class="control">
                       <button type="submit" class="button is-primary">Submit</button>
+                      <button type="button" class="button is-danger" @click="cancelAdd">Cancel</button>
                     </div>
                   </td>
                 </tr>
@@ -87,6 +89,7 @@
             <div class="field">
               <div class="control">
                 <button type="button" class="button is-danger" @click="confirmDelete">Delete</button>
+                <button type="button" class="button is-danger" @click="cancelDelete">Cancel</button>
               </div>
             </div>
           </form>
@@ -168,8 +171,17 @@ export default defineComponent({
         });
     };
 
+    const cancelAdd = () => {
+      hideAddModal();
+    };
+
+
     const showDeleteModal = () => {
       isDeleteModalVisible.value = true;
+    };
+
+    const cancelDelete = () => {
+      hideDeleteModal();
     };
 
     const hideDeleteModal = () => {
@@ -213,6 +225,8 @@ export default defineComponent({
       hideDeleteModal,
       confirmDelete,
       deleteData,
+      cancelAdd,
+      cancelDelete,
     };
   },
   components: {
