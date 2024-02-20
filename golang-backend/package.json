@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "devextreme-aspnet-data-nojquery": "^3.0.0"
+  }
+}

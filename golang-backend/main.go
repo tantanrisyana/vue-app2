@@ -33,7 +33,7 @@ func main() {
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:5173"}, // Sesuaikan dengan alamat aplikasi Vue Anda
+		AllowOrigins: []string{"http://localhost:5173", "http://localhost:8080"}, // Sesuaikan dengan alamat aplikasi Vue Anda
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 	}))
 

@@ -103,7 +103,8 @@
 import { defineComponent, ref } from "vue";
 import axios from "axios";
 import { DxDataGrid, DxoColumn } from "devextreme-vue/ui/data-grid";
-import "@/assets/styles.css"; // Import the styles
+import "@/assets/styles.css"; 
+import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 
 export default defineComponent({
   name: "App",
