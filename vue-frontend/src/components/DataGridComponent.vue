@@ -17,7 +17,32 @@
         <dxo-column data-field="name" caption="Name"></dxo-column>
         <dxo-column data-field="alamat" caption="Alamat"></dxo-column>
         <dxo-column data-field="email" caption="Email"></dxo-column>
+        <DxHeaderFilter :visible="true" />
+        <DxGroupPanel :visible="true" />
+        <DxScrolling mode="virtual" />
+        <DxEditing
+          :allow-adding="true"
+          :allow-updating="true"
+          :allow-deleting="true"
+          mode="row"
+          :use-icons="true"
+          @onInitNewRow="handleInitNewRow"
+          @onRowInserting="handleRowInserting"
+          @onRowUpdating="handleRowUpdating"
+          @onRowRemoving="confirmDelete"
+        />
+        <DxScrolling row-rendering-mode="virtual"/>
+      <DxPaging :page-size="5"/>
+      <DxPager
+        :visible="true"
+        :allowed-page-sizes="pageSizes"
+        :display-mode="displayMode"
+        :show-page-size-selector="showPageSizeSelector"
+        :show-info="showInfo"
+        :show-navigation-buttons="showNavButtons"
+      />
       </dx-data-grid>
+
     </section>
 
     <div class="modal" :class="{ 'is-active': isAddModalVisible }">
@@ -102,9 +127,19 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import axios from "axios";
-import { DxDataGrid, DxoColumn } from "devextreme-vue/ui/data-grid";
+import { 
+        DxDataGrid,
+        DxoColumn,
+        DxEditing,
+        DxHeaderFilter,
+        DxGroupPanel,
+        DxScrolling,
+        DxPager,
+        DxPaging,
+    }
+    from "devextreme-vue/data-grid";
+import 'devextreme/dist/css/dx.material.blue.light.css'
 import "@/assets/styles.css"; 
-import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 
 export default defineComponent({
   name: "App",
@@ -231,9 +266,15 @@ export default defineComponent({
     };
   },
   components: {
-    DxDataGrid,
-    DxoColumn,
-  },
+      DxDataGrid,
+      DxEditing,
+      DxHeaderFilter,
+      DxGroupPanel,
+      DxScrolling,
+      DxoColumn,
+      DxPager,
+      DxPaging,
+    },
 });
 
 </script>
