@@ -3,15 +3,16 @@
     <header>
       <h1>DATA SISWA</h1>
     </header>
-    <br />
+    <br/>
 
     <section class="grid-section">
-      <div class="mb-3 d-flex justify-content-between align-items-center">
-        <button class="btn btn-success" @click="showAddModal">Add Data</button>
-        <button class="btn btn-success" @click="showDeleteModal">Delete Data</button>
-      </div>
-
-      <dx-data-grid :data-source="filteredGridData" key-expr="id" :column-auto-width="true">
+      <dx-data-grid 
+      :data-source="filteredGridData" key-expr="id" 
+      :column-auto-width="true"
+      :remote-operations="true"
+      :width="'70%'"
+      style="margin: 0 auto; text-align: center;"
+      >
         <dxo-column data-field="no" caption="No"></dxo-column>
         <dxo-column v-if="false" data-field="id" caption="Id"></dxo-column>
         <dxo-column data-field="name" caption="Name"></dxo-column>
@@ -21,16 +22,16 @@
         <DxGroupPanel :visible="true" />
         <DxScrolling mode="virtual" />
         <DxEditing
-          :allow-adding="true"
           :allow-updating="true"
           :allow-deleting="true"
-          mode="row"
+          mode="popup"
           :use-icons="true"
           @onInitNewRow="handleInitNewRow"
-          @onRowInserting="handleRowInserting"
+          @onRowInserting="showAddModal"
           @onRowUpdating="handleRowUpdating"
           @onRowRemoving="confirmDelete"
         />
+        
         <DxScrolling row-rendering-mode="virtual"/>
       <DxPaging :page-size="5"/>
       <DxPager
@@ -41,9 +42,22 @@
         :show-info="showInfo"
         :show-navigation-buttons="showNavButtons"
       />
-      </dx-data-grid>
-
+    </dx-data-grid>
     </section>
+    <DxButton
+              :width="120"
+              text="Tambah"
+              type="success"
+              styling-mode="outlined"
+              @click="showAddModal"
+            />&nbsp
+      <DxButton
+              :width="120"
+              text="Hapus"
+              type="danger"
+              styling-mode="outlined"
+              @click="showDeleteModal"
+            /><br>
 
     <div class="modal" :class="{ 'is-active': isAddModalVisible }">
       <div class="modal-background" @click="hideAddModal"></div>
@@ -121,11 +135,13 @@
         </section>
       </div>
     </div>
+    
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import DxButton, { DxButtonTypes } from 'devextreme-vue/button';
 import axios from "axios";
 import { 
         DxDataGrid,
@@ -136,9 +152,10 @@ import {
         DxScrolling,
         DxPager,
         DxPaging,
+      
     }
     from "devextreme-vue/data-grid";
-import 'devextreme/dist/css/dx.material.blue.light.css'
+import "devextreme/dist/css/dx.material.blue.light.css";
 import "@/assets/styles.css"; 
 
 export default defineComponent({
@@ -274,6 +291,7 @@ export default defineComponent({
       DxoColumn,
       DxPager,
       DxPaging,
+      DxButton,
     },
 });
 
