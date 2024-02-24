@@ -12,6 +12,7 @@ import {
         DxScrolling,
     
 } from 'devextreme-vue/data-grid';
+import {DxButton} from 'devextreme-vue/button';
 
 // Buat aplikasi Vue
 const app = createApp(DataGridComponent);
@@ -25,6 +26,7 @@ app.component(
         DxHeaderFilter,
         DxGroupPanel,
         DxScrolling,
+        DxButton,
     );
 
 

@@ -1,9 +1,4 @@
 <template>
-  <div class="grid-container">
-    <header>
-      <h1>DATA SISWA</h1>
-    </header>
-    <br/>
   <DxDataGrid
     :data-source="dataSource"
     key-expr="id"
@@ -11,12 +6,9 @@
     :column-auto-width="true"
     :width="'70%'"
     style="margin: 0 auto; text-align: center"
-    @row-prepared="onRowPrepared"
   >
-    <DxColumn data-field="no" caption="No" />
-    <DxColumn data-field="id" caption="ID" :visible="false" />
-    <DxColumn data-field="name" caption="Nama" />
-    <DxColumn data-field="alamat" caption="Alamat" />
+    <DxColumn data-field="id" caption="ID" />
+    <DxColumn data-field="name" caption="Name" />
     <DxColumn data-field="email" caption="Email" />
 
     <DxHeaderFilter :visible="true" />
@@ -45,8 +37,6 @@
       :show-navigation-buttons="showNavButtons"
     />
   </DxDataGrid>
-
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -60,49 +50,47 @@ import {
   DxGrouping,
   DxScrolling,
   DxPaging,
-  DxPager
-} from 'devextreme-vue/data-grid'
-import axios from 'axios'
-import 'devextreme/dist/css/dx.material.blue.light.compact.css'
-import '@/assets/styles.css'
+  DxPager,
+} from "devextreme-vue/data-grid";
+import axios from "axios";
+import "devextreme/dist/css/dx.material.blue.light.compact.css";
 
-const url = 'http://localhost:8080/siswa'
+const url = "http://localhost:8080/users";
 
 const dataSource = {
-  key: 'id',
+  key: "id",
   load: async () => {
     try {
-      const response = await axios.get(url)
-      const dataWithNo = response.data.map((item, index) => ({ ...item, no: index + 1 }))
-      return dataWithNo
+      const response = await axios.get(url);
+      return response.data;
     } catch (error) {
-      console.error('Error loading data:', error)
-      throw error
+      console.error("Error loading data:", error);
+      throw error;
     }
   },
   insert: async (values) => {
     try {
-      await axios.post(url, values)
+      await axios.post(url, values);
     } catch (error) {
-      console.error('Error inserting data:', error)
-      throw error
+      console.error("Error inserting data:", error);
+      throw error;
     }
   },
   update: async (key, values) => {
     try {
-      await axios.put(`${url}/${key}`, values)
+      await axios.put(`${url}/${key}`, values);
     } catch (error) {
-      console.error('Error updating data:', error)
-      throw error
+      console.error("Error updating data:", error);
+      throw error;
     }
   },
   remove: async (key) => {
     try {
-      await axios.delete(`${url}/${key}`)
+      await axios.delete(`${url}/${key}`);
     } catch (error) {
-      console.error('Error deleting data:', error)
-      throw error
+      console.error("Error deleting data:", error);
+      throw error;
     }
-  }
-}
+  },
+};
 </script>
