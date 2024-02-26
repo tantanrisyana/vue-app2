@@ -61,10 +61,8 @@
       :allowed-page-sizes="pageSizes"
       :show-page-size-selector="true"
     />
-    <DxPaging :page-size="10"/>
-    <template #discountCellTemplate="{ data: cellData }">
-      <DiscountCell :cell-data="cellData"/>
-    </template>
+    <DxPaging :page-size="7"/>
+    
   </DxDataGrid>
 </template>
 <script setup lang="ts">
