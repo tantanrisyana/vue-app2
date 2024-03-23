@@ -30,11 +30,11 @@ class SiswaController extends Controller
 
     public function update(Request $request, Siswa $siswa)
     {
-        $request->validate([
-            'nama' => 'required|string',
-            'umur' => 'required|integer',
-            'alamat' => 'required|string',
-        ]);
+        //$request->validate([
+        //    'nama' => 'required|string',
+        //    'umur' => 'required|integer',
+        //    'alamat' => 'required|string',
+       // ]);
 
         $siswa->update($request->all());
         return $siswa;
